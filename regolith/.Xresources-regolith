@@ -1,17 +1,20 @@
+! -- This points to the root Xresource file.
+#include "/etc/regolith/styles/cahuella/root"
+
 ! -- Styles - Colors
-#include "/etc/regolith/styles/cahuella/color"
+!#include "/etc/regolith/styles/cahuella/color"
 
 ! -- Styles - Fonts
-#include "~/.Xresources.d/typeface-firacode"
+!#include "/etc/regolith/styles/cahuella/typeface"
+!#include "~/.Xresources.d/typeface-firacode"
 
 ! -- Styles - Theme
-#include "/etc/regolith/styles/cahuella/theme"
+!#include "/etc/regolith/styles/cahuella/theme"
 
 ! -- Applications
 ! These files map values defined above into specific app settings.
-#include "/etc/regolith/styles/st-term"
-#include "/etc/regolith/styles/i3-wm"
-#include "/etc/regolith/styles/i3xrocks"
-#include "/etc/regolith/styles/rofi"
-#include "/etc/regolith/styles/gnome"
-
+!#include "/etc/regolith/styles/st-term"
+!#include "/etc/regolith/styles/i3-wm"
+!#include "/etc/regolith/styles/i3xrocks"
+!#include "/etc/regolith/styles/rofi"
+!#include "/etc/regolith/styles/gnome"

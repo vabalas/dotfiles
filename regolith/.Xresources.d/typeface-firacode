@@ -1,9 +1,9 @@
 ! Typeface: Fira Code
-#define typeface_bar_glyph  Fira Code Medium 13
-#define typeface_wm         Fira Code Medium 13
-#define typeface_bar        pango:Fira Code Medium 13, Material Design Icons 13
-#define typeface_rofi       Fira Code Medium 16
-#define typeface_terminal   Fira Code:pixelsize=18:antialias=true:autohint=true
+#define typeface_bar_glyph  Fira Code 13
+#define typeface_wm         Fira Code 13
+#define typeface_bar        pango:Fira Code 13, Material Design Icons 13
+#define typeface_rofi       Fira Code 16
+#define typeface_terminal   Fira Code:pixelsize=30:antialias=true:autohint=true
 
 #define typeface_bar_glyph_wifi 
 #define typeface_bar_glyph_wired 
