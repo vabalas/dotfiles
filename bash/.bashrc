@@ -7,7 +7,7 @@
 export CDPATH=.:~
 
 # Path settings
-export PATH=$PATH:$HOME/Software/Scripts
+export PATH=$HOME/.local/bin:$HOME/Software/Scripts:$PATH
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
@@ -35,8 +35,14 @@ bind '"\t":menu-complete'
 
 
 ## Functions ======================================================
+# Emacs cTags - create TAGS index file
+create_etags () {
+ #"*.[ch]"
+    find . -type f -iname "*.[ch]" | xargs etags -a
+}
+
 # Color man output
-man() {
+man () {
     env \
     LESS_TERMCAP_mb="$(printf "\e[1;31m")" \
     LESS_TERMCAP_md="$(printf "\e[1;31m")" \
@@ -47,7 +53,6 @@ man() {
     LESS_TERMCAP_us="$(printf "\e[1;32m")" \
     man "${@}"
 }
-
 
 ## Aliases ========================================================
 alias ..='cd ..'
@@ -62,12 +67,22 @@ alias .t='thunar ./ & disown'
 alias grep='grep --color=auto'
 alias diff='diff --color=auto'
 
+alias clp='xclip -sel clip'
 
 ## Prompt =========================================================
 # https://misc.flogisoft.com/bash/tip_colors_and_formatting
 # How many directories to show before ellipsis.
 PROMPT_DIRTRIM=2
 
-# Prompt format
-PS1='\[\e[1m\]\[\e[34m\]\w\[\e[39m\]\[\e[33m\] \$ \[\e[31m\] huh? \[\e[0m\e[39m\]'
+# Prompt format ezprompt.net
+PS1='\[\e[1m\]\[\e[34m\]\w\[\e[39m\]\[\e[33m\] \$ \[\e[34m\]\h\[\e[31m\] ? \[\e[0m\e[39m\]'
 PS2='\[\e[31m\]:> \[\e[39m\]'
+
+
+## 8dev ===========================================================
+#WRT builder docker
+wb () {
+    PARAMS=""
+    [[ -n $1 ]] && PARAMS="-c \"$@\""
+    eval "docker run -h wrt_builder -v $PWD:/home/baker/${PWD##*/} --rm -it wrt_baker:latest /bin/bash -c 'cd /home/baker/${PWD##*/}; exec /bin/bash $PARAMS'"
+}

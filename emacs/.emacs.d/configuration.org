@@ -19,7 +19,6 @@ Kill ring memory and connection to system clipboard
   (global-set-key (kbd "<f5>") 'revert-buffer)
   ;; Trailing whitespace
   (setq-default show-trailing-whitespace t)
-
 #+END_SRC
 
 Encoding settings [[http://ergoemacs.org/emacs/emacs_n_unicode.html][link]]
@@ -30,7 +29,24 @@ Encoding settings [[http://ergoemacs.org/emacs/emacs_n_unicode.html][link]]
 
 Tabs [[https://www.emacswiki.org/emacs/NoTabs][no tabs]]
 #+BEGIN_SRC emacs-lisp
-  (setq-default indent-tabs-mode nil)
+ (setq-default indent-tabs-mode t)
+#+END_SRC
+
+Whitespace mode
+#+BEGIN_SRC emacs-lisp
+(progn
+ ;; Make whitespace-mode with very basic background coloring for whitespaces.
+  ;; http://ergoemacs.org/emacs/whitespace-mode.html
+  (setq whitespace-style (quote (face spaces tabs newline space-mark tab-mark newline-mark )))
+
+  ;; Make whitespace-mode and whitespace-newline-mode use “¶” for end of line char and “▷” for tab.
+  (setq whitespace-display-mappings
+        ;; all numbers are unicode codepoint in decimal. e.g. (insert-char 182 1)
+        '(
+          (space-mark 32 [183] [46]) ; SPACE 32 「 」, 183 MIDDLE DOT 「·」, 46 FULL STOP 「.」
+          (newline-mark 10 [182 10]) ; LINE FEED,
+          (tab-mark 9 [9655 9] [92 9]) ; tab
+          )))
 #+END_SRC
 
 Try out packages without installing them
@@ -52,15 +68,56 @@ Generate dummy lorem-ipsum text
     :ensure t)
 #+END_SRC
 
-Emoji support
+* Looks
+Highlight current line
 #+BEGIN_SRC emacs-lisp
-  (use-package emojify
-    :ensure t)
-;;  (add-hook 'after-init-hook #'global-emojify-mode)
+  (global-hl-line-mode +1)
 #+END_SRC
 
-* Navigation and search
+Highlight parens
+#+BEGIN_SRC emacs-lisp
+;; Enable paren highlighting
+(show-paren-mode 1)
 
+;; highlight brackets
+;;(setq show-paren-style 'parenthesis)
+
+;; highlight entire expression
+ (setq show-paren-style 'expression)
+
+;; highlight brackets if visible, else entire expression
+;; (setq show-paren-style 'mixed)
+#+END_SRC
+
+Get rid of the tool and menu bars, scrollbar
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (scroll-bar-mode -1)
+#+END_SRC
+
+Display line numbers
+#+BEGIN_SRC emacs-lisp
+  (global-display-line-numbers-mode 1)
+#+END_SRC
+
+Theme
+#+BEGIN_SRC emacs-lisp
+(use-package doom-themes
+  :config
+  ;; Global settings (defaults)
+  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
+        doom-themes-enable-italic t) ; if nil, italics is universally disabled
+  (load-theme 'doom-nord t)
+
+  ;; Enable flashing mode-line on errors
+  (doom-themes-visual-bell-config)
+
+  ;; Corrects (and improves) org-mode's native fontification.
+  (doom-themes-org-config))
+#+End_SRC
+
+* Navigation and search
 Window navigation with =ace-window=
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
@@ -105,9 +162,6 @@ Advanced incremental and reverse search using =swiper= and =counsel=. [[https://
       ))
 #+END_SRC
 
-#+RESULTS:
-: t
-
 Jump to character. [[https://cestlaz-nikola.github.io/posts/using-emacs-7-avy/][Navigation with Avy]]
 #+BEGIN_SRC emacs-lisp
   (use-package avy
@@ -115,34 +169,26 @@ Jump to character. [[https://cestlaz-nikola.github.io/posts/using-emacs-7-avy/][
     :bind ("M-s" . avy-goto-char))
 #+END_SRC
 
-* File manager
-
-[[https://cestlaz-nikola.github.io/posts/using-emacs-38-dired/][Tutorial to for dired]]
-#+BEGIN_SRC emacs-lisp
-;  (use-package dired+
-;    :ensure t
-;    :config (require 'dired+))
-#+END_SRC
-
-* Editing, autocomplete and spellchecking
-
+* Editing, autocomplete spellcheck
 Interactive edit. [[https://cestlaz-nikola.github.io/posts/using-emacs-18-narrow/][link to tutorial.]]
 #+BEGIN_SRC emacs-lisp
 (use-package iedit
   :ensure t)
 #+END_SRC
 
-#+RESULTS:
-
-Autocomplete package. [[https://cestlaz-nikola.github.io/posts/using-emacs-8-autocomplete/][link to tutorial]]
+Company mode auto complete
 #+BEGIN_SRC emacs-lisp
-  (use-package auto-complete
-    :ensure t
-    :init
-    (progn
-      (ac-config-default)
-      (global-auto-complete-mode t)
-      ))
+(use-package company
+  :ensure t
+  ;; :init
+  ;; (setq company-idle-delay nil  ; avoid auto completion popup, use TAB
+  ;;                               ; to show it
+  ;;       company-tooltip-align-annotations t)
+  :hook (after-init . global-company-mode)
+  :bind
+  (:map prog-mode-map
+        ("C-i" . company-indent-or-complete-common)
+        ("C-M-i" . completion-at-point)))
 #+END_SRC
 
 Code checking on the fly with [[https://cestlaz-nikola.github.io/posts/using-emacs-12-python/][flycheck]]
@@ -152,74 +198,6 @@ Code checking on the fly with [[https://cestlaz-nikola.github.io/posts/using-ema
     :init
     (global-flycheck-mode t))
 #+END_SRC
-
-Snippets
-#+BEGIN_SRC emacs-lisp
-(use-package yasnippet
-  :ensure t
-  :init
-    (yas-global-mode 1))
-
-(use-package yasnippet-snippets
-  :ensure t
-  :init)
-
-#+END_SRC
-
-#+RESULTS:
-
-* Looks
-
-Highlight current line
-#+BEGIN_SRC emacs-lisp
-  (global-hl-line-mode +1)
-#+END_SRC
-
-Get rid of the tool and menu bars, scrollbar
-#+BEGIN_SRC emacs-lisp
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
-#+END_SRC
-
-#+RESULTS:
-
-Display line numbers
-#+BEGIN_SRC emacs-lisp
-  (global-display-line-numbers-mode 1)
-#+END_SRC
-
-Theme
-#+BEGIN_SRC emacs-lisp
-  (use-package doom-themes
-    :ensure t)
-
-
-  ;; Load the theme (doom-one, doom-molokai, etc); keep in mind that each theme
-  ;; may have their own settings.
-  (load-theme 'doom-dracula t)
-
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config)
-
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-
-  ;; (let ((height (face-attribute 'default :height)))
-  ;;   ;; for all linum/nlinum users
-  ;;   (set-face-attribute 'linum nil :height height)
-  ;;   ;; only for `linum-relative' users:
-  ;;   (set-face-attribute 'linum-relative-current-face nil :height height)
-  ;;   ;; only for `nlinum-relative' users:
-  ;;   (set-face-attribute 'nlinum-relative-current-face nil :height height))
-
-#+End_SRC
-
-#+RESULTS:
 
 * Git
 Install =Magit= package
@@ -232,6 +210,11 @@ Some =Magit= keybinds
 #+BEGIN_SRC emacs-lisp
 ;; To display information about the current Git repositor
 (global-set-key (kbd "C-x g") 'magit-status)
+#+END_SRC
+
+https://emacs.stackexchange.com/questions/43643/magit-how-to-show-differences-within-lines
+#+BEGIN_SRC emacs-lisp
+(setq magit-diff-refine-hunk (quote all))
 #+END_SRC
 
 * Org-mode settings
@@ -279,116 +262,100 @@ Org mode source blocks - no indentation
 ** Org Capture
 #+BEGIN_SRC emacs-lisp
 (setq org-capture-templates
-      '(("t" "To Do Item" entry (file+headline "~/Documents/org/p.org" "To Do Užduotys") "* TODO %?\n%T" :prepend t)
-        ("n" "Note" entry (file+headline "~/Documents/org/p.org" "Užrašai") "* %?\n%T" :prepend t)))
+      '(
+        ("t" "PhD::ToDo" entry (file+headline "~/personal/Documents/PhD/Org/main.org" "TODOs") "* TODO %T %?" :prepend t)
+        ("n" "PhD::Note" entry (file+headline "~/personal/Documents/PhD/Org/main.org" "Notes") "* %T %?" :prepend t)
+        ("1" "personal::ToDo" entry (file+headline "~/personal/Documents/Org/personal.org" "TODOs") "* TODO %T %?" :prepend t)
+        ("2" "personal::Note" entry (file+headline "~/personal/Documents/Org/personal.org" "Notes") "* %T %?" :prepend t)
+        ))
 #+END_SRC
-
-#+RESULTS:
-| t | To Do Item | entry | (file+headline ~/Documents/org/p.org To Do Užduotys) | * TODO %? |
-
-* Better PDF support
+* Compile
+https://www.emacswiki.org/emacs/CompileCommand
 #+BEGIN_SRC emacs-lisp
-(use-package pdf-tools
- ;; :pin manual ;; manually update
- :config
- ;; initialise
- (pdf-tools-install)
- ;; open pdfs scaled to fit page
- (setq-default pdf-view-display-size 'fit-page)
- ;; automatically annotate highlights
- (setq pdf-annot-activate-created-annotations t))
+(global-set-key "\C-x\C-m" 'compile)
 #+END_SRC
-
-#+RESULTS:
-: t
-
 * Language specific
-** C++
-   [[https://cestlaz-nikola.github.io/posts/using-emacs-32-cpp/][Tutorial to using cpp in emacs]]
-
+** C/C++
+*** Code navigation
+=Ctags=
 #+BEGIN_SRC emacs-lisp
-  ;; tags for code navigation
-;;  (use-package ggtags
-;;    :ensure t
-;;    :config 
-;;    (add-hook 'c-mode-common-hook
-;;              (lambda ()
-;;                (when (derived-mode-p 'c-mode 'c++-mode 'java-mode)
-;;                  (ggtags-mode 1))))
-;;    )
+;; Goes back after visiting tag
+(global-set-key (kbd "M-*") 'pop-tag-mark)
 #+END_SRC
 
-** R
-   Emacs speaks statistics. [[https://ess.r-project.org/][Link]]
+=xcscope=
 #+BEGIN_SRC emacs-lisp
-  (use-package ess
-    :ensure t
-    :init)
-  (use-package ess-R-data-view
-    :ensure t
-    :init)
-  (use-package ess-smart-underscore
-    :ensure t
-    :init)
-#+END_SRC
-
-#+RESULTS:
-: t
-
-** Python
-Default python interpreter *python3*
-#+BEGIN_SRC emacs-lisp
-(setq python-shell-interpreter "python3")
-#+END_SRC
-
-Using Python in emacs [[https://cestlaz-nikola.github.io/posts/using-emacs-12-python/][link]]
-Jedi provides more extensive completion for Python.
-#+BEGIN_SRC emacs-lisp
-
-(use-package jedi
-  :ensure t
-  :init
-    (add-hook 'python-mode-hook 'jedi:setup)
-    (add-hook 'python-mode-hook 'jedi:ac-setup))
-
-(use-package elpy
-  :ensure t
-  :init
-  (elpy-enable))
-
-
-(setq jedi:environment-root "jedi")  ; or any other name you like
-(setq jedi:environment-virtualenv
-      (append python-environment-virtualenv
-              '("--python" "/usr/bin/python3")))
-#+END_SRC
-
-#+RESULTS:
-| virtualenv | --system-site-packages | --quiet | --python | /usr/bin/python3 |
-
-** Tex
-   AUCTeX stuff [[https://piotr.is/2010/emacs-as-the-ultimate-latex-editor/][link to guide]]
-#+BEGIN_SRC emacs-lisp
-(use-package auctex
-  :defer t
+(use-package xcscope
   :ensure t)
 
-  (setq TeX-auto-save t)
-  (setq TeX-parse-self t)
-  (setq TeX-save-query nil)
-  (setq TeX-PDF-mode t)
-  ;(setq TeX-master nil)
+(cscope-setup)
+#+END_SRC
+*** Whitespace, indentation and style
+Enable white-space mode when working with c or c++
+#+BEGIN_SRC emacs-lisp
+(add-hook 'c-mode-common-hook
+    (lambda ()
+        (when (derived-mode-p 'c-mode 'c++-mode 'lua-mode 'sh-mode)
+	    (whitespace-mode 1))))
 #+END_SRC
 
-
-** Ledger
+Change the indentation level:
 #+BEGIN_SRC emacs-lisp
-  (use-package ledger-mode
-    :ensure t
-    :init
-    (setq ledger-clear-whole-transactions 1))
+(setq-default c-basic-offset 8)
+#+END_SRC
 
-  (use-package flycheck-ledger
+Gnu Style of C (see [[https://www.emacswiki.org/emacs/IndentingC][here]]):
+#+BEGIN_SRC emacs-lisp
+(setq c-default-style "linux")
+#+END_SRC
+
+*** Code editing
+Irony-mode https://syamajala.github.io/c-ide.html
+#+BEGIN_SRC emacs-lisp
+;; (use-package irony
+;;   :ensure t)
+
+;; (add-hook 'c++-mode-hook 'irony-mode)
+;; (add-hook 'c-mode-hook 'irony-mode)
+;; (add-hook 'objc-mode-hook 'irony-mode)
+
+;; (add-hook 'irony-mode-hook 'irony-cdb-autosetup-compile-options)
+
+;; (add-hook 'irony-mode-hook 'company-irony-setup-begin-commands)
+;; (setq company-backends (delete 'company-semantic company-backends))
+;; (eval-after-load 'company
+;;   '(add-to-list
+;;     'company-backends 'company-irony))
+#+END_SRC
+
+If you want to enable tab-completion with no delay use the following:
+#+BEGIN_SRC emacs-lisp
+;;(setq company-idle-delay 0)
+;;(define-key c-mode-map [(tab)] 'company-complete)
+;;(define-key c++-mode-map [(tab)] 'company-complete)
+#+END_SRC
+
+*** Static analyzer
+Clang analyzer
+#+BEGIN_SRC emacs-lisp
+(use-package flycheck-clang-analyzer
+  :ensure t
+  :after flycheck
+  :config (flycheck-clang-analyzer-setup))
+
+(add-hook 'c++-mode-hook 'flycheck-mode)
+(add-hook 'c-mode-hook 'flycheck-mode)
+
+(use-package flycheck-irony
+  :ensure t)
+
+(eval-after-load 'flycheck
+  '(add-hook 'flycheck-mode-hook #'flycheck-irony-setup))
+#+END_SRC
+
+** Lua
+#+BEGIN_SRC emacs-lisp
+  (use-package lua-mode
     :ensure t)
 #+END_SRC
 
@@ -408,3 +375,29 @@ Jedi provides more extensive completion for Python.
 (add-to-list 'flycheck-checkers 'proselint)
 #+END_SRC
 
+** yaml
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :ensure t)
+#+END_SRC
+
+#+RESULTS:
+** json
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :ensure t)
+#+END_SRC
+
+#+RESULTS:
+
+** Markdown
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :ensure t)
+#+END_SRC
+** Docker
+Syntax highlighting
+#+BEGIN_SRC emacs-lisp
+(use-package dockerfile-mode
+  :ensure t)
+#+END_SRC
