@@ -1,14 +1,11 @@
-* How this works
+* This is how it works
 Adapted from [[http://brandon.invergo.net/news/2012-05-26-using-gnu-stow-to-manage-your-dotfiles.html][here]]. In a nutshell we keep all dotfiles in a single
 place, and create symbolic links using =stow=.
 
 #+BEGIN_SRC shell
-stow --target=~ bash
-stow --target=~ emacs
-stow --target=~ i3
-stow --target=~ R
-stow --target=~ rofi
-stow --target=~ termite
+stow --target=/home/<user> bash
+stow --target=/home/<user> emacs
+stow --target=/home/<user> regolith
 #+END_SRC
 
 #+RESULTS:
