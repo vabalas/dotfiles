@@ -199,6 +199,12 @@ Code checking on the fly with [[https://cestlaz-nikola.github.io/posts/using-ema
     (global-flycheck-mode t))
 #+END_SRC
 
+* Fuzzyfinder
+https://github.com/bling/fzf.el
+#+BEGIN_SRC emacs-lisp
+(use-package fzf
+  :ensure t)
+#+END_SRC
 * Git
 Install =Magit= package
 #+BEGIN_SRC emacs-lisp
@@ -359,7 +365,23 @@ Clang analyzer
     :ensure t)
 #+END_SRC
 
-#+RESULTS:
+Static checker with flycheck and lua-check
+#+BEGIN_SRC emacs-lisp
+
+;; Configuration file for this syntax checker. See Configuration files.
+defcustom flycheck-luacheckrc¶
+
+
+
+;; The luacheck standards to use via one or more --std arguments.
+defcustom flycheck-luacheck-standards
+
+
+
+
+(add-hook 'lua-mode-hook 'flycheck-mode)
+
+#+END_SRC
 
 ** Text
 #+BEGIN_SRC emacs-lisp

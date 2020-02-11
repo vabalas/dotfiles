@@ -44,7 +44,7 @@ There are two things you can do about this warning:
  '(global-display-line-numbers-mode t)
  '(package-selected-packages
    (quote
-    (irony flycheck-rtags rtags flycheck-clang-analyzer markdown-mode xcscope org-jira json-mode lua-mode yaml-mode dockerfile-mode fish-mode yasnippet-snippets which-key use-package try solarized-theme pdf-tools org-bullets magit lorem-ipsum ledger-mode jedi iedit flycheck-ledger ess-smart-underscore ess-R-data-view emojify elpy doom-themes counsel auctex ace-window)))
+    (fzf irony flycheck-rtags rtags flycheck-clang-analyzer markdown-mode xcscope org-jira json-mode lua-mode yaml-mode dockerfile-mode fish-mode yasnippet-snippets which-key use-package try solarized-theme pdf-tools org-bullets magit lorem-ipsum ledger-mode jedi iedit flycheck-ledger ess-smart-underscore ess-R-data-view emojify elpy doom-themes counsel auctex ace-window)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
