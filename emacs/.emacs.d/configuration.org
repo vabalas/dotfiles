@@ -1,26 +1,83 @@
+* Init
+** System check
+For system specific settings
+https://karl-voit.at/2017/02/11/my-system-is-foobar/
+#+BEGIN_SRC emacs-lisp
+;; Check if the hostname is crapbag (personal laptop)
+(defun my-system-is-crapbag ()
+  "Return true if the system we are running on is crapbag"
+  (or
+    (string-equal system-name "crapbag")
+    (string-equal system-name "crapbag.lan")
+    )
+  )
+
+;; Check if the hostname is tandy1000 (work laptop)
+(defun my-system-is-tandy1000 ()
+  "Return true if the system we are running on is tandy1000"
+  (or
+    (string-equal system-name "tandy1000")
+    (string-equal system-name "tandy1000.lan")
+    )
+  )
+#+END_SRC
 * General
+** Backups
+#+BEGIN_SRC emacs-lisp
+;; make backup to a designated dir, mirroring the full pat
+(defun my-backup-file-name (fpath)
+  "Return a new file path of a given file path.
+If the new path's directories does not exist, create them."
+  (let* (
+        (backupRootDir "~/.emacs.d/backup/")
+        (filePath (replace-regexp-in-string "[A-Za-z]:" "" fpath )) ; remove Windows driver letter in path, for example, “C:”
+        (backupFilePath (replace-regexp-in-string "//" "/" (concat backupRootDir filePath "~") ))
+        )
+    (make-directory (file-name-directory backupFilePath) (file-name-directory backupFilePath))
+    backupFilePath
+  )
+)
+
+(setq make-backup-file-name-function 'my-backup-file-name)
+#+END_SRC
+
+** Package management
 Refresh packages
 #+BEGIN_SRC emacs-lisp
 (package-refresh-contents)
 #+END_SRC
 
+https://github.com/raxod502/straight.el
+#+BEGIN_SRC emacs-lisp
+(when (my-system-is-crapbag)
+  (defvar bootstrap-version)
+  (let ((bootstrap-file
+         (expand-file-name "~/.emacs.d/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
+    (unless (file-exists-p bootstrap-file)
+      (with-current-buffer
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
+    (load bootstrap-file nil 'nomessage))
+)
+#+END_SRC
+
+Try out packages without installing them
+#+BEGIN_SRC emacs-lisp
+  (use-package try
+    :ensure t)
+#+END_SRC
+
+** Clipboard
 Kill ring memory and connection to system clipboard
 #+BEGIN_SRC emacs-lisp
 (setq save-interprogram-paste-before-kill t)
 #+END_SRC
 
-#+BEGIN_SRC emacs-lisp
-  (setq inhibit-startup-message t)
-  (fset 'yes-or-no-p 'y-or-n-p)
-
-  (global-auto-revert-mode 1)
-  (setq auto-revert-verbose nil)
-  ;; Pressing <f5 reloads the current buffer
-  (global-set-key (kbd "<f5>") 'revert-buffer)
-  ;; Trailing whitespace
-  (setq-default show-trailing-whitespace t)
-#+END_SRC
-
+** Encoding, whitespace
 Encoding settings [[http://ergoemacs.org/emacs/emacs_n_unicode.html][link]]
 #+BEGIN_SRC emacs-lisp
   (set-language-environment "UTF-8")
@@ -49,12 +106,7 @@ Whitespace mode
           )))
 #+END_SRC
 
-Try out packages without installing them
-#+BEGIN_SRC emacs-lisp
-  (use-package try
-    :ensure t)
-#+END_SRC
-
+** Help
 Bring up help on key combinations
 #+BEGIN_SRC emacs-lisp
   (use-package which-key
@@ -62,16 +114,29 @@ Bring up help on key combinations
     :config (which-key-mode))
 #+END_SRC
 
+** Misc
+#+BEGIN_SRC emacs-lisp
+  (setq inhibit-startup-message t)
+  (fset 'yes-or-no-p 'y-or-n-p)
+
+  (global-auto-revert-mode 1)
+  (setq auto-revert-verbose nil)
+  ;; Pressing <f5 reloads the current buffer
+  (global-set-key (kbd "<f5>") 'revert-buffer)
+  ;; Trailing whitespace
+  (setq-default show-trailing-whitespace t)
+#+END_SRC
+
 Generate dummy lorem-ipsum text
 #+BEGIN_SRC emacs-lisp
   (use-package lorem-ipsum
     :ensure t)
 #+END_SRC
-
 * Looks
+** Misc
 Highlight current line
 #+BEGIN_SRC emacs-lisp
-  (global-hl-line-mode +1)
+(global-hl-line-mode +1)
 #+END_SRC
 
 Highlight parens
@@ -83,42 +148,35 @@ Highlight parens
 ;;(setq show-paren-style 'parenthesis)
 
 ;; highlight entire expression
- (setq show-paren-style 'expression)
+;; (setq show-paren-style 'expression)
 
 ;; highlight brackets if visible, else entire expression
-;; (setq show-paren-style 'mixed)
+(setq show-paren-style 'mixed)
 #+END_SRC
 
 Get rid of the tool and menu bars, scrollbar
 #+BEGIN_SRC emacs-lisp
-  (tool-bar-mode -1)
-  (menu-bar-mode -1)
-  (scroll-bar-mode -1)
+(tool-bar-mode -1)
+(menu-bar-mode -1)
+(scroll-bar-mode -1)
 #+END_SRC
 
 Display line numbers
 #+BEGIN_SRC emacs-lisp
-  (global-display-line-numbers-mode 1)
+(global-display-line-numbers-mode 1)
 #+END_SRC
 
-Theme
+** Theme
 #+BEGIN_SRC emacs-lisp
-(use-package doom-themes
-  :config
-  ;; Global settings (defaults)
-  (setq doom-themes-enable-bold t    ; if nil, bold is universally disabled
-        doom-themes-enable-italic t) ; if nil, italics is universally disabled
-  (load-theme 'doom-nord t)
+(use-package dracula-theme
+  :ensure t)
 
-  ;; Enable flashing mode-line on errors
-  (doom-themes-visual-bell-config)
-
-  ;; Corrects (and improves) org-mode's native fontification.
-  (doom-themes-org-config))
+(load-theme 'dracula-theme)
 #+End_SRC
 
 * Navigation and search
-Window navigation with =ace-window=
+** Window navigation
+=ace-window=
 #+BEGIN_SRC emacs-lisp
   (use-package ace-window
     :ensure t
@@ -127,10 +185,11 @@ Window navigation with =ace-window=
       (global-set-key [remap other-window] 'ace-window)
       (custom-set-faces
        '(aw-leading-char-face
-         ((t (:inherit ace-jump-face-foreground :height 2.0))))) 
+         ((t (:inherit ace-jump-face-foreground :height 2.0)))))
       ))
 #+END_SRC
 
+** Search
 Advanced incremental and reverse search using =swiper= and =counsel=. [[https://cestlaz-nikola.github.io/posts/using-emacs-6-swiper/][link to tutorial]].
 #+BEGIN_SRC emacs-lisp
   (use-package counsel
@@ -169,7 +228,8 @@ Jump to character. [[https://cestlaz-nikola.github.io/posts/using-emacs-7-avy/][
     :bind ("M-s" . avy-goto-char))
 #+END_SRC
 
-* Editing, autocomplete spellcheck
+* Editing and spellcheck
+** Autocomplete
 Interactive edit. [[https://cestlaz-nikola.github.io/posts/using-emacs-18-narrow/][link to tutorial.]]
 #+BEGIN_SRC emacs-lisp
 (use-package iedit
@@ -190,7 +250,7 @@ Company mode auto complete
         ("C-i" . company-indent-or-complete-common)
         ("C-M-i" . completion-at-point)))
 #+END_SRC
-
+** Check
 Code checking on the fly with [[https://cestlaz-nikola.github.io/posts/using-emacs-12-python/][flycheck]]
 #+BEGIN_SRC emacs-lisp
   (use-package flycheck
@@ -199,12 +259,16 @@ Code checking on the fly with [[https://cestlaz-nikola.github.io/posts/using-ema
     (global-flycheck-mode t))
 #+END_SRC
 
-* Fuzzyfinder
-https://github.com/bling/fzf.el
+** Snippets
 #+BEGIN_SRC emacs-lisp
-(use-package fzf
+(use-package yasnippet
   :ensure t)
+
+;;(setq yas-snippet-dirs '("~/personal/resources/snippets"))
+
+(yas-global-mode 1)
 #+END_SRC
+
 * Git
 Install =Magit= package
 #+BEGIN_SRC emacs-lisp
@@ -223,63 +287,51 @@ https://emacs.stackexchange.com/questions/43643/magit-how-to-show-differences-wi
 (setq magit-diff-refine-hunk (quote all))
 #+END_SRC
 
-* Org-mode settings
-** Main
-The last four lines define global keys for some commands — please
-choose suitable keys yourself.
+* Dired
 #+BEGIN_SRC emacs-lisp
-(global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
-(global-set-key "\C-cc" 'org-capture)
-(global-set-key "\C-cb" 'org-switchb)
+(setq dired-listing-switches "-alh --color")
 #+END_SRC
 
-Multi-state workflows [[https://orgmode.org/guide/Multi_002dstate-workflows.html][link]]
+Dired sorting
 #+BEGIN_SRC emacs-lisp
+(defun dired-sort ()
+  "Sort dired dir listing in different ways.
+Prompt for a choice.
+URL `http://ergoemacs.org/emacs/dired_sort.html'
+Version 2018-12-23"
+  (interactive)
+  (let ($sort-by $arg)
+    (setq $sort-by (ido-completing-read "Sort by:" '( "date" "size" "name" )))
+    (cond
+     ((equal $sort-by "name") (setq $arg "-Al "))
+     ((equal $sort-by "date") (setq $arg "-Al -t"))
+     ((equal $sort-by "size") (setq $arg "-Al -S"))
+     ;; ((equal $sort-by "dir") (setq $arg "-Al --group-directories-first"))
+     (t (error "logic error 09535" )))
+    (dired-sort-other $arg )))
 #+END_SRC
 
-Add timestampt when a certain TODO item was marked DONE [[https://orgmode.org/manual/Closing-items.html][link]]
+https://github.com/Fuco1/dired-hacks
+
+Subtree view
 #+BEGIN_SRC emacs-lisp
-  (setq org-log-done 'time)
+(use-package dired-subtree
+  :ensure t
+  :config
+  (bind-keys :map dired-mode-map
+             ("i" . dired-subtree-insert)
+             (";" . dired-subtree-remove)))
 #+END_SRC
 
-To get the nice looking bullets when in org-mode
+Narrow
 #+BEGIN_SRC emacs-lisp
-  (use-package org-bullets
-    :ensure t
-    :config
-    (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+(use-package dired-narrow
+  :ensure t
+  :config
+  (bind-keys :map dired-mode-map
+             ("n" . dired-narrow)))
 #+END_SRC
 
-Org-babel
-#+BEGIN_SRC emacs-lisp
-(org-babel-do-load-languages
- 'org-babel-load-languages '(
-   (R . t)
-   (shell . t)
-))
-#+END_SRC
-
-
-Org mode source blocks - no indentation
-#+BEGIN_SRC emacs-lisp
-(setq org-src-preserve-indentation t)
-#+END_SRC
-** Org Capture
-#+BEGIN_SRC emacs-lisp
-(setq org-capture-templates
-      '(
-        ("t" "PhD::ToDo" entry (file+headline "~/personal/Documents/PhD/Org/main.org" "TODOs") "* TODO %T %?" :prepend t)
-        ("n" "PhD::Note" entry (file+headline "~/personal/Documents/PhD/Org/main.org" "Notes") "* %T %?" :prepend t)
-        ("1" "personal::ToDo" entry (file+headline "~/personal/Documents/Org/personal.org" "TODOs") "* TODO %T %?" :prepend t)
-        ("2" "personal::Note" entry (file+headline "~/personal/Documents/Org/personal.org" "Notes") "* %T %?" :prepend t)
-        ))
-#+END_SRC
-* Compile
-https://www.emacswiki.org/emacs/CompileCommand
-#+BEGIN_SRC emacs-lisp
-(global-set-key "\C-x\C-m" 'compile)
-#+END_SRC
 * Language specific
 ** C/C++
 *** Code navigation
@@ -360,6 +412,7 @@ Clang analyzer
 #+END_SRC
 
 ** Lua
+*** lua mode and static checking
 #+BEGIN_SRC emacs-lisp
   (use-package lua-mode
     :ensure t)
@@ -369,18 +422,20 @@ Static checker with flycheck and lua-check
 #+BEGIN_SRC emacs-lisp
 
 ;; Configuration file for this syntax checker. See Configuration files.
-defcustom flycheck-luacheckrc¶
-
-
+;;defcustom flycheck-luacheckrc¶
 
 ;; The luacheck standards to use via one or more --std arguments.
-defcustom flycheck-luacheck-standards
-
-
-
+;;defcustom flycheck-luacheck-standards
 
 (add-hook 'lua-mode-hook 'flycheck-mode)
 
+#+END_SRC
+*** Whitespace, indenation and style
+Indent with tabs by default
+#+BEGIN_SRC emacs-lisp
+(setq-default lua-indent-level 8 )
+
+(add-hook 'lua-mode-hook (lambda () (setq indent-tabs-mode t)))
 #+END_SRC
 
 ** Text
@@ -422,4 +477,172 @@ Syntax highlighting
 #+BEGIN_SRC emacs-lisp
 (use-package dockerfile-mode
   :ensure t)
+#+END_SRC
+* Org-mode settings
+** Main
+
+The last four lines define global keys for some commands — please
+choose suitable keys yourself.
+#+BEGIN_SRC emacs-lisp
+(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cc" 'org-capture)
+(global-set-key "\C-cb" 'org-switchb)
+#+END_SRC
+
+Add timestamp when a certain TODO item was marked DONE [[https://orgmode.org/manual/Closing-items.html][link]]
+#+BEGIN_SRC emacs-lisp
+  (setq org-log-done 'time)
+#+END_SRC
+
+Org-babel
+#+BEGIN_SRC emacs-lisp
+(org-babel-do-load-languages
+ 'org-babel-load-languages '(
+   (R . t)
+   (shell . t)
+))
+#+END_SRC
+
+Org mode source blocks - no indentation
+#+BEGIN_SRC emacs-lisp
+(setq org-src-preserve-indentation t)
+#+END_SRC
+
+** Directories
+#+BEGIN_SRC emacs-lisp
+(setq crapbag/org-path "~/personal/org/")
+(setq crapbag/notes-path "~/personal/notes/")
+(setq crapbag/org-inbox-directory (expand-file-name (concat crapbag/org-path "inbox.org")))
+#+END_SRC
+
+** Agenda
+#+BEGIN_SRC emacs-lisp
+(when (my-system-is-crapbag)
+  (setq org-agenda-files (list crapbag/org-inbox-directory))
+)
+
+(when (my-system-is-tandy1000)
+  (setq org-agenda-files (list "~/personal/org/tasks.org"
+                               "~/personal/org/inbox.org"))
+)
+#+END_SRC
+
+** Capture
+https://stackoverflow.com/questions/11902620/org-mode-how-do-i-create-a-new-file-with-org-capture
+#+BEGIN_SRC emacs-lisp
+(defun crapbag/capture-report-data-file (path)
+  (interactive)
+  (let ((name (read-string "Name: ")))
+    (expand-file-name (format "%s-%s.org" (format-time-string "%Y%m%d%H%M") name) path)))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+(when (my-system-is-crapbag)
+  (setq org-capture-templates
+        '(("i" "Inbox" entry (file+headline crapbag/org-inbox-directory "Inbox") "* TODO %U %? %^G" :prepend t)
+          ("z" "Note" entry (file (lambda () (crapbag/capture-report-data-file crapbag/notes-path))) "* %U %? %^G")))
+)
+
+(when (my-system-is-tandy1000)
+(setq org-capture-templates
+      '(("n" "Note" entry (file+headline "~/personal/org/main.org" "Notes") "* %^{Headline}\nCREATED: %U\n")
+        ("i" "Inbox" entry (file "~/personal/org/inbox.org") "* TODO %^{Headline}%^g\nCREATED: %U\n")
+        ("t" "Task" entry (file "~/personal/org/tasks.org") "* TODO %^{Headline}%^g\n SCHEDULED: %^{Scheduled to begin}t DEADLINE: %^{Deadline}T\nCREATED: %U\n")))
+
+)
+#+END_SRC
+
+** Latex previews
+#+BEGIN_SRC emacs-lisp
+(when (my-system-is-crapbag)
+  (setq org-format-latex-options (plist-put org-format-latex-options :scale 1.4))
+)
+#+END_SRC
+
+** Roam
+https://github.com/jethrokuan/org-roam
+#+BEGIN_SRC emacs-lisp
+(when (my-system-is-crapbag)
+  (use-package org-roam
+        :hook
+        (after-init . org-roam-mode)
+        :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+        :custom
+        (org-roam-directory "~/personal/org/roam/")
+        :bind (:map org-roam-mode-map
+                (("C-c n l" . org-roam)
+                 ("C-c n f" . org-roam-find-file)
+                 ("C-c n g" . org-roam-show-graph))
+                :map org-mode-map
+                (("C-c n i" . org-roam-insert))))
+)
+#+END_SRC
+
+** Looks
+https://zzamboni.org/post/beautifying-org-mode-in-emacs/
+#+BEGIN_SRC emacs-lisp
+(setq org-hide-emphasis-markers t)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+#+END_SRC
+* Elfeed
+- RSS and atom reader https://github.com/skeeto/elfeed
+- Specific for personal computer https://nicolas.petton.fr/blog/per-computer-emacs-settings.html
+- specific elfeed settings from http://pragmaticemacs.com/category/elfeed/
+
+#+BEGIN_SRC emacs-lisp
+;; (defvar host (substring (shell-command-to-string "hostname") 0 -1))
+
+;; (if (string= host "crapbag")
+;;   (progn (use-package elfeed-org
+;; 	   :ensure t
+;; 	   :config
+;; 	   (elfeed-org)
+;; 	   (setq rmh-elfeed-org-files (list "/home/lukas/personal/Documents/Org/elfeed.org")))
+
+;; 	 (use-package elfeed
+;; 	   :ensure t))
+;;   (print "Different host"))
+#+END_SRC
+
+* mu4e
+
+#+BEGIN_SRC emacs-lisp
+;; the exact path may differ --- check it
+;;(add-to-list 'load-path "/usr/share/emacs/site-lisp/mu4e/")
+;;(require 'mu4e)
+#+END_SRC
+
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package org-mu4e
+  ;;   :ensure t)
+
+  ;; ;;store link to message if in header view, not to header query
+  ;; (setq org-mu4e-link-query-in-headers-mode nil)
+
+
+  ;; ;;location of my maildir
+  ;; (setq mu4e-maildir (expand-file-name "~/.mail"))
+
+  ;; ;; ;;command used to get mail
+  ;; ;; ;; use this for testing
+  ;;  (setq mu4e-get-mail-command "true")
+  ;; ;; ;; use this to sync with mbsync
+  ;; ;; ;; ;;(setq mu4e-get-mail-command "mbsync gmail")
+
+  ;; ;; ;;rename files when moving
+  ;; ;; ;;NEEDED FOR MBSYNC
+  ;;  (setq mu4e-change-filenames-when-moving t)
+
+  ;; ;; ;; set up queue for offline email
+  ;; ;; ;; use mu mkdir  ~/Maildir/queue to set up first
+  ;;  (setq smtpmail-queue-mail nil  ;; start in normal mode
+  ;;        smtpmail-queue-dir   "~/.mail/queue/cur")
 #+END_SRC

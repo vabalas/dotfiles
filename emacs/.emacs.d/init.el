@@ -1,3 +1,5 @@
+
+
 ;;; MELPA package repository https://melpa.org/#/getting-started
 
 ;; https://medium.com/@FrancoPasut/emacs-melpa-and-the-failed-to-download-gnu-archive-error-b834bbe4491e
@@ -35,22 +37,24 @@ There are two things you can do about this warning:
 ;; Load myinit.org
 (org-babel-load-file (expand-file-name "~/.emacs.d/configuration.org"))
 
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0))))
+ '(default
+    ((t
+      (:family "Fira Code" :foundry "CTDB" :slant normal :weight normal :height 143 :width normal))))
  '(global-display-line-numbers-mode t)
- '(package-selected-packages
-   (quote
-    (fzf irony flycheck-rtags rtags flycheck-clang-analyzer markdown-mode xcscope org-jira json-mode lua-mode yaml-mode dockerfile-mode fish-mode yasnippet-snippets which-key use-package try solarized-theme pdf-tools org-bullets magit lorem-ipsum ledger-mode jedi iedit flycheck-ledger ess-smart-underscore ess-R-data-view emojify elpy doom-themes counsel auctex ace-window)))
- '(tool-bar-mode nil))
+ '(show-paren-mode t)
+ '(tool-bar-mode nil)
+ '(trailing-whitespace ((t (:background "orange red"))))
+ '(variable-pitch ((t (:family "Fira Code" :height 180 :weight light)))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:family "Fira Code" :foundry "CTDB" :slant normal :weight normal :height 120 :width normal))))
- '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0))))
- '(trailing-whitespace ((t (:background "orange red")))))
+ '(default ((t (:family "Fira Code" :foundry "CTDB" :slant normal :weight normal :height 143 :width normal))))
+ '(aw-leading-char-face ((t (:inherit ace-jump-face-foreground :height 2.0)))))
