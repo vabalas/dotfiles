@@ -170,8 +170,6 @@ Display line numbers
 #+BEGIN_SRC emacs-lisp
 (use-package dracula-theme
   :ensure t)
-
-(load-theme 'dracula-theme)
 #+End_SRC
 
 * Navigation and search
@@ -563,20 +561,21 @@ https://stackoverflow.com/questions/11902620/org-mode-how-do-i-create-a-new-file
 ** Roam
 https://github.com/jethrokuan/org-roam
 #+BEGIN_SRC emacs-lisp
-(use-package org-roam
-      :ensure t
-      :if ((my-system-is-crapbag))
-      :hook
-      (after-init . org-roam-mode)
-      :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
-      :custom
-      (org-roam-directory "~/personal/org/roam/")
-      :bind (:map org-roam-mode-map
-              (("C-c n l" . org-roam)
-               ("C-c n f" . org-roam-find-file)
-               ("C-c n g" . org-roam-show-graph))
-              :map org-mode-map
-              (("C-c n i" . org-roam-insert))))
+(when (my-system-is-crapbag)
+  (use-package org-roam
+        :ensure t
+        :hook
+        (after-init . org-roam-mode)
+        :straight (:host github :repo "jethrokuan/org-roam" :branch "develop")
+        :custom
+        (org-roam-directory "~/personal/org/roam/")
+        :bind (:map org-roam-mode-map
+                (("C-c n l" . org-roam)
+                 ("C-c n f" . org-roam-find-file)
+                 ("C-c n g" . org-roam-show-graph))
+                :map org-mode-map
+                (("C-c n i" . org-roam-insert))))
+)
 #+END_SRC
 
 ** Looks
